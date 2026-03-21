@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Grocery Warehouse</title>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+:root { --primary: #1B8A3A; --primary-dark: #14692C; --primary-light: #D4EDDA; --accent: #FF8C00; --danger: #E53935; --warning: #FB8C00; --bg: #F0F4F0; --card: #fff; --text: #1a1a2e; --text-light: #6B7280; --shadow: 0 2px 12px rgba(0,0,0,0.08); --radius: 16px; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); max-width: 480px; margin: 0 auto; padding-bottom: 75px; min-height: 100vh;
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%231B8A3A' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Bottom Nav */
+.bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: var(--card); display: flex; border-top: 1px solid #e0e0e0; z-index: 100; backdrop-filter: blur(10px); background: rgba(255,255,255,0.95); }
+.bottom-nav button { flex: 1; padding: 8px 0 6px; border: none; background: none; cursor: pointer; font-size: 10px; font-family: 'Poppins'; color: var(--text-light); display: flex; flex-direction: column; align-items: center; gap: 2px; transition: all 0.2s; }
+.bottom-nav button.active { color: var(--primary); font-weight: 600; }
+.bottom-nav button .icon { font-size: 22px; transition: transform 0.2s; }
+.bottom-nav button.active .icon { transform: scale(1.15); }
+
+/* Pages */
+.page { display: none; padding: 16px; animation: fadeIn 0.3s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Hero Header */
+.hero { background: linear-gradient(135deg, #1B8A3A 0%, #2ECC71 50%, #27AE60 100%); border-radius: 0 0 28px 28px; padding: 28px 20px 24px; margin: -16px -16px 20px; color: white; position: relative; overflow: hidden; }
+.hero::before { content: ''; position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%; }
+.hero::after { content: '🥬🍅🥕🧅'; position: absolute; bottom: 8px; right: 16px; font-size: 28px; opacity: 0.3; }
+.hero .welcome { font-size: 24px; font-weight: 700; margin-bottom: 2px; }
+.hero .subtitle { font-size: 13px; opacity: 0.85; }
+.hero .date { font-size: 11px; opacity: 0.7; margin-top: 4px; }
+
+/* Stats */
+.stats-row { display: flex; gap: 10px; margin-bottom: 20px; }
+.stat-card { flex: 1; padding: 16px 10px; border-radius: var(--radius); text-align: center; cursor: pointer; box-shadow: var(--shadow); transition: transform 0.2s; background: var(--card); }
+.stat-card:hover { transform: translateY(-2px); }
+.stat-card .num { font-size: 28px; font-weight: 700; }
+.stat-card .lbl { font-size: 10px; color: var(--text-light); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+.stat-total .num { color: var(--primary); }
+.stat-expiring .num { color: var(--warning); }
+.stat-expired .num { color: var(--danger); }
+
+/* Inputs */
+input, select, textarea { width: 100%; padding: 12px 14px; border: 2px solid #E5E7EB; border-radius: 12px; font-size: 14px; font-family: 'Poppins'; background: var(--card); margin-bottom: 8px; transition: border-color 0.2s, box-shadow 0.2s; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(27,138,58,0.1); }
+
+/* Filter chips */
+.filter-label { font-size: 11px; color: var(--text-light); margin: 10px 0 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; flex-wrap: wrap; }
+.chip { padding: 6px 14px; border-radius: 20px; border: 2px solid #E5E7EB; background: var(--card); font-size: 12px; font-family: 'Poppins'; font-weight: 500; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+.chip:hover { border-color: var(--primary); }
+.chip.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 2px 8px rgba(27,138,58,0.3); }
+
+/* Item Cards */
+.item-card { background: var(--card); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; box-shadow: var(--shadow); display: flex; align-items: center; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; border-left: 4px solid var(--primary); }
+.item-card:hover { transform: translateX(4px); box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+.item-card.expiring-card { border-left-color: var(--warning); }
+.item-card.expired-card { border-left-color: var(--danger); background: #FFF5F5; }
+.item-info { flex: 1; }
+.item-name { font-weight: 600; font-size: 15px; }
+.item-meta { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+.item-expiry { font-size: 11px; margin-top: 3px; font-weight: 500; }
+.item-expiry.expired { color: var(--danger); }
+.item-expiry.expiring { color: var(--warning); }
+.item-badges { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; margin-right: 8px; }
+.badge { padding: 3px 10px; border-radius: 10px; font-size: 10px; font-weight: 600; white-space: nowrap; }
+.badge-cat { background: var(--primary-light); color: var(--primary-dark); }
+.badge-loc { background: #E3F2FD; color: #1565C0; }
+.btn-del { background: none; border: none; cursor: pointer; font-size: 18px; color: #ccc; padding: 4px; transition: color 0.2s; }
+.btn-del:hover { color: var(--danger); }
+
+/* Buttons */
+.btn { width: 100%; padding: 14px; border: none; border-radius: 14px; font-size: 15px; font-weight: 600; font-family: 'Poppins'; cursor: pointer; transition: all 0.2s; }
+.btn-primary { background: linear-gradient(135deg, var(--primary), #2ECC71); color: white; box-shadow: 0 4px 12px rgba(27,138,58,0.3); }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(27,138,58,0.4); }
+
+/* Form */
+.form-group { margin-bottom: 12px; }
+.form-group label { display: block; font-size: 12px; color: var(--text-light); margin-bottom: 4px; font-weight: 500; }
+.form-row { display: flex; gap: 10px; }
+.form-row > * { flex: 1; }
+h2 { font-size: 20px; margin-bottom: 16px; color: var(--text); font-weight: 700; }
+h2 .emoji { margin-right: 6px; }
+
+/* Manage rows */
+.manage-row { display: flex; align-items: center; background: var(--card); padding: 14px 16px; border-radius: 14px; margin-bottom: 8px; box-shadow: var(--shadow); transition: transform 0.15s; }
+.manage-row:hover { transform: translateX(2px); }
+.manage-row span { flex: 1; font-size: 14px; font-weight: 500; }
+.add-row { display: flex; gap: 8px; margin-bottom: 16px; }
+.add-row input { margin-bottom: 0; }
+.btn-icon { width: 46px; height: 46px; border-radius: 12px; border: none; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s; }
+.btn-icon:hover { transform: scale(1.05); }
+.btn-add { background: linear-gradient(135deg, var(--primary), #2ECC71); color: white; box-shadow: 0 2px 8px rgba(27,138,58,0.3); }
+
+/* Dashboard sections */
+.dash-section { margin-bottom: 20px; }
+.dash-section h3 { font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
+.dash-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--card); border-radius: 12px; margin-bottom: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); transition: transform 0.15s; }
+.dash-row:hover { transform: translateX(3px); }
+.dash-row .val { font-weight: 700; color: var(--primary); font-size: 16px; }
+
+.section-title { font-size: 16px; font-weight: 700; margin: 24px 0 12px; color: var(--text); }
+
+.empty-msg { text-align: center; color: var(--text-light); padding: 40px 0; font-size: 14px; }
+.empty-msg .empty-icon { font-size: 48px; display: block; margin-bottom: 8px; }
+
+/* Scanner */
+.scan-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; border: 2px dashed var(--primary); border-radius: 14px; background: rgba(27,138,58,0.05); color: var(--primary); font-size: 15px; font-weight: 600; font-family: 'Poppins'; cursor: pointer; margin-bottom: 12px; transition: all 0.2s; }
+.scan-btn:hover { background: rgba(27,138,58,0.1); border-style: solid; }
+#scanner-container { margin-bottom: 12px; border-radius: 14px; overflow: hidden; }
+.scan-result { background: linear-gradient(135deg, #E8F5E9, #C8E6C9); border-radius: 12px; padding: 12px 16px; margin-bottom: 12px; font-size: 13px; color: var(--primary-dark); }
+.scan-result .product-name { font-weight: 700; font-size: 16px; }
+.scan-loading { text-align: center; padding: 12px; color: var(--text-light); font-size: 13px; }
+
+/* Toast notification */
+.toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: var(--primary); color: white; padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: 500; z-index: 200; transition: transform 0.3s ease; box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* Item count badge */
+.count-badge { display: inline-block; background: var(--primary); color: white; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: 6px; }
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- HOME PAGE -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="welcome">🏪 Grocery Warehouse</div>
+    <div class="subtitle">Your home inventory at a glance</div>
+    <div class="date" id="today-date"></div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card stat-total" onclick="showPageDirect('items')"><div class="num" id="stat-total">0</div><div class="lbl">Total</div></div>
+    <div class="stat-card stat-expiring"><div class="num" id="stat-expiring">0</div><div class="lbl">Expiring</div></div>
+    <div class="stat-card stat-expired"><div class="num" id="stat-expired">0</div><div class="lbl">Expired</div></div>
+  </div>
+  <div class="dash-section"><h3>📦 By Category</h3><div id="d-by-cat"></div></div>
+  <div class="dash-section"><h3>📍 By Location</h3><div id="d-by-loc"></div></div>
+</div>
+
+<!-- ITEMS PAGE -->
+<div id="page-items" class="page">
+  <h2><span class="emoji">📦</span>All Items <span class="count-badge" id="item-count">0</span></h2>
+  <input type="text" id="search-input" placeholder="🔍 Search items...">
+  <div class="filter-label">Category</div>
+  <div class="chips" id="category-chips"></div>
+  <div class="filter-label">Location</div>
+  <div class="chips" id="location-chips"></div>
+  <div style="margin-top:12px" id="items-list"></div>
+</div>
+
+<!-- ADD/EDIT PAGE -->
+<div id="page-add" class="page">
+  <h2 id="form-title"><span class="emoji">➕</span>Add Item</h2>
+  <button class="scan-btn" id="scan-btn" onclick="toggleScanner()">📷 Scan Barcode</button>
+  <div id="scanner-container"></div>
+  <div id="scan-status"></div>
+  <input type="hidden" id="edit-id">
+  <div class="form-group"><label>Name *</label><input type="text" id="f-name" placeholder="e.g. Aashirvaad Atta"></div>
+  <div class="form-row">
+    <div class="form-group"><label>Quantity *</label><input type="number" step="0.01" id="f-qty" placeholder="e.g. 5"></div>
+    <div class="form-group"><label>Unit</label><select id="f-unit"><option>pcs</option><option>kg</option><option>g</option><option>liters</option><option>ml</option><option>packs</option><option>bottles</option><option>cans</option></select></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Category</label><select id="f-category"></select></div>
+    <div class="form-group"><label>Location</label><select id="f-location"></select></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Purchase Date *</label><input type="date" id="f-purchase"></div>
+    <div class="form-group"><label>Expiry Date</label><input type="date" id="f-expiry"></div>
+  </div>
+  <div class="form-group"><label>Notes</label><textarea id="f-notes" rows="2" placeholder="Optional notes..."></textarea></div>
+  <button class="btn btn-primary" onclick="saveItem()">💾 Save Item</button>
+</div>
+
+<!-- MANAGE PAGE -->
+<div id="page-manage" class="page">
+  <h2><span class="emoji">📋</span>Manage Categories</h2>
+  <div class="add-row">
+    <input type="text" id="new-cat-name" placeholder="New category name...">
+    <button class="btn-icon btn-add" onclick="addCategory()">+</button>
+  </div>
+  <div id="cat-list"></div>
+  <div class="section-title">📍 Manage Locations</div>
+  <div class="add-row">
+    <input type="text" id="new-loc-name" placeholder="e.g. shelf-4, kitchen rack...">
+    <button class="btn-icon btn-add" onclick="addLocation()">+</button>
+  </div>
+  <div id="loc-list"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="active" onclick="showPage('home',this)"><span class="icon">🏠</span>Home</button>
+  <button onclick="showPage('items',this)"><span class="icon">📦</span>Items</button>
+  <button onclick="showPage('add',this)"><span class="icon">➕</span>Add</button>
+  <button onclick="showPage('manage',this)"><span class="icon">⚙️</span>Manage</button>
+</nav>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
