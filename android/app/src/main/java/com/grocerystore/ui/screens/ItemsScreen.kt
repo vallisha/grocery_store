@@ -14,6 +14,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -106,7 +108,7 @@ fun GroceryItemCard(item: GroceryItem, onClick: () -> Unit) {
         Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp), elevation = CardDefaults.cardElevation(3.dp),
     ) {
-        Row(Modifier.drawWithContent { drawContent(); drawRect(borderColor, size = androidx.compose.ui.geometry.Size(4.dp.toPx(), size.height)) }.padding(start = 12.dp, end = 12.dp, top = 12.dp, bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.drawWithContent { drawContent(); drawRect(borderColor, size = Size(4.dp.toPx(), size.height)) }.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text(item.name, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
                 Text("${item.quantity} ${item.unit}", fontSize = 12.sp, color = Color.Gray)
