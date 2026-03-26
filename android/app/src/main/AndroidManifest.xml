@@ -5,8 +5,9 @@
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <application
         android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:label="Grocery Store"
-        android:usesCleartextTraffic="true"
         android:theme="@style/Theme.GroceryStore">
         <activity
             android:name=".MainActivity"
