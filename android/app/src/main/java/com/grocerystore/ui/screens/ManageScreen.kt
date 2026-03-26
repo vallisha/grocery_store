@@ -39,7 +39,7 @@ fun ManageScreen(viewModel: GroceryViewModel) {
             }
             Spacer(Modifier.height(12.dp))
         }
-        items(categories, key = { it.id }) { cat ->
+        items(categories, key = { "cat_${it.id}" }) { cat ->
             ManageRow(cat.name) { viewModel.deleteCategory(cat.id) }
         }
 
@@ -56,7 +56,7 @@ fun ManageScreen(viewModel: GroceryViewModel) {
             }
             Spacer(Modifier.height(12.dp))
         }
-        items(locations, key = { it.id }) { loc ->
+        items(locations, key = { "loc_${it.id}" }) { loc ->
             ManageRow(loc.name) { viewModel.deleteLocation(loc.id) }
         }
     }
