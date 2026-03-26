@@ -1,0 +1,41 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Shopping cart body -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M33,42 L38,68 L75,68 L80,48 L42,48"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <!-- Cart handle -->
+    <path
+        android:pathData="M28,38 L33,42"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round" />
+    <!-- Cart wheels -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M44,74 A4,4 0 1,1 44,74.01" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M68,74 A4,4 0 1,1 68,74.01" />
+    <!-- Apple (grocery item in cart) -->
+    <path
+        android:fillColor="#FF8A80"
+        android:pathData="M52,52 A7,7 0 1,1 52,52.01" />
+    <!-- Leaf on apple -->
+    <path
+        android:pathData="M52,45 Q55,41 58,43"
+        android:strokeColor="#A5D6A7"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round" />
+    <!-- Orange (grocery item) -->
+    <path
+        android:fillColor="#FFCC80"
+        android:pathData="M67,56 A5.5,5.5 0 1,1 67,56.01" />
+</vector>
