@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -42,5 +43,8 @@ dependencies {
     implementation("androidx.camera:camera-view:1.3.1")
     // ML Kit barcode scanning
     implementation("com.google.mlkit:barcode-scanning:17.2.0")
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+    implementation("com.google.firebase:firebase-firestore-ktx")
     debugImplementation("androidx.compose.ui:ui-tooling")
 }
