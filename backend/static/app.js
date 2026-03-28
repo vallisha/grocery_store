@@ -119,6 +119,7 @@ async function loadItems() {
           <span class="badge badge-loc">${getLocEmoji(i.location)} ${i.location}</span>
           <span class="badge badge-cat">${i.category}</span>
         </div>
+        <button class="btn-consume" onclick="event.stopPropagation();consumeItem(${i.id})" title="Use 1">🍽️</button>
         <button class="btn-del" onclick="event.stopPropagation();deleteItem(${i.id})">🗑️</button>
       </div>`;
     }).join('');
@@ -129,6 +130,12 @@ async function deleteItem(id) {
   if (!confirm('Delete this item?')) return;
   await api('/items/' + id, { method: 'DELETE' });
   toast('🗑️ Item deleted');
+  loadItems();
+}
+
+async function consumeItem(id) {
+  const res = await api('/items/' + id + '/consume', { method: 'POST' });
+  toast(res.deleted ? '✅ Item finished & removed' : '🍽️ Used 1');
   loadItems();
 }
 
