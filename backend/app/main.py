@@ -228,7 +228,21 @@ def update_item(item_id: int, updates: GroceryItemUpdate, db: Session = Depends(
     return item
 
 
-@app.delete("/items/{item_id}", status_code=204)
+@app.post("/items/{item_id}/consume")
+def consume_item(item_id: int, db: Session = Depends(get_db)):
+    item = db.query(GroceryItem).filter(GroceryItem.id == item_id).first()
+    if not item:
+        raise HTTPException(404, "Item not found")
+    item.quantity -= 1
+    if item.quantity <= 0:
+        db.delete(item)
+        db.commit()
+        return {"deleted": True}
+    db.commit()
+    db.refresh(item)
+    return item
+
+@app.delete("/items/{item_id}")
 def delete_item(item_id: int, db: Session = Depends(get_db)):
     item = db.query(GroceryItem).filter(GroceryItem.id == item_id).first()
     if not item:
