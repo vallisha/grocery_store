@@ -69,6 +69,11 @@ fun BarcodeScannerScreen(viewModel: GroceryViewModel, onResult: (name: String?, 
                                         scanStatus = "Found: $barcode — looking up..."
                                         scope.launch {
                                             val result = viewModel.lookupBarcode(barcode)
+                                            if (result != null) {
+                                                scanStatus = "✅ Found: ${result.name ?: barcode}"
+                                            } else {
+                                                scanStatus = "⚠️ Product not found — barcode saved"
+                                            }
                                             onResult(result?.name, result?.category, result?.unit, barcode)
                                         }
                                     }
