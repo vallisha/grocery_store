@@ -24,7 +24,7 @@ val UNITS = listOf("pcs", "kg", "g", "liters", "ml", "packs", "bottles", "cans")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddEditItemScreen(viewModel: GroceryViewModel, itemId: Int? = null, onBack: () -> Unit) {
+fun AddEditItemScreen(viewModel: GroceryViewModel, itemId: Int? = null, onBack: () -> Unit, onScan: (() -> Unit)? = null, scannedName: String? = null, scannedCategory: String? = null, scannedUnit: String? = null, scannedBarcode: String? = null) {
     var name by remember { mutableStateOf("") }
     var quantity by remember { mutableStateOf("") }
     var unit by remember { mutableStateOf(UNITS[0]) }
@@ -35,6 +35,16 @@ fun AddEditItemScreen(viewModel: GroceryViewModel, itemId: Int? = null, onBack: 
     var notes by remember { mutableStateOf("") }
     var barcode by remember { mutableStateOf<String?>(null) }
     var loaded by remember { mutableStateOf(itemId == null) }
+
+    // Apply scanned data
+    LaunchedEffect(scannedBarcode) {
+        if (scannedBarcode != null) {
+            barcode = scannedBarcode
+            if (!scannedName.isNullOrBlank()) name = scannedName
+            if (!scannedCategory.isNullOrBlank()) category = scannedCategory
+            if (!scannedUnit.isNullOrBlank()) unit = scannedUnit
+        }
+    }
     val categories by viewModel.categories.collectAsState()
     val locations by viewModel.locations.collectAsState()
 
@@ -63,6 +73,16 @@ fun AddEditItemScreen(viewModel: GroceryViewModel, itemId: Int? = null, onBack: 
         if (!loaded) { CircularProgressIndicator(Modifier.padding(padding).padding(16.dp)); return@Scaffold }
 
         Column(Modifier.padding(padding).padding(16.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            // Scan barcode button (only on add screen)
+            if (itemId == null && onScan != null) {
+                OutlinedButton(
+                    onClick = onScan,
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    border = ButtonDefaults.outlinedButtonBorder.copy(brush = androidx.compose.ui.graphics.SolidColor(Color(0xFF1B8A3A)))
+                ) { Text("📷 Scan Barcode", color = Color(0xFF1B8A3A)) }
+            }
+
             // Barcode scan result
             barcode?.let {
                 Card(shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9))) {
