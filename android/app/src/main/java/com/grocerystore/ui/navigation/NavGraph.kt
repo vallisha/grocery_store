@@ -57,7 +57,17 @@ fun NavGraph() {
                 ItemsScreen(viewModel, onItemClick = { navController.navigate("edit/$it") })
             }
             composable("add") {
-                AddEditItemScreen(viewModel, onBack = { navController.navigate("items") { popUpTo("items") { inclusive = true }; launchSingleTop = true } })
+                val savedState = it.savedStateHandle
+                val scannedName = savedState.get<String>("scanned_name")
+                val scannedCategory = savedState.get<String>("scanned_category")
+                val scannedUnit = savedState.get<String>("scanned_unit")
+                val scannedBarcode = savedState.get<String>("scanned_barcode")
+                AddEditItemScreen(viewModel,
+                    onBack = { navController.navigate("items") { popUpTo("items") { inclusive = true }; launchSingleTop = true } },
+                    onScan = { navController.navigate("scan") },
+                    scannedName = scannedName, scannedCategory = scannedCategory,
+                    scannedUnit = scannedUnit, scannedBarcode = scannedBarcode
+                )
             }
             composable("edit/{itemId}", arguments = listOf(navArgument("itemId") { type = NavType.IntType })) {
                 AddEditItemScreen(viewModel, itemId = it.arguments?.getInt("itemId"), onBack = { navController.popBackStack() })
